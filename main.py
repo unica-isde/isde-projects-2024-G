@@ -55,3 +55,11 @@ async def request_classification(request: Request):
             "classification_scores": json.dumps(classification_scores),
         },
     )
+
+
+@app.get("/upload-image", response_class=HTMLResponse)
+def upload_image(request: Request):
+    return templates.TemplateResponse(
+        "classification_upload_image.html",
+        {"request": request, "models": Configuration.models, "errors": []},
+    )
