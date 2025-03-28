@@ -5,7 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.config import Configuration
 from app.forms.classification_form import ClassificationForm
+from app.forms.classification_upload_form import ClassificationUploadForm
 from app.ml.classification_utils import classify_image
+from app.ml.classification_utils import fetch_image_bytes
 from app.utils import list_images
 
 
@@ -63,3 +65,38 @@ def upload_image(request: Request):
         "classification_upload_image.html",
         {"request": request, "models": Configuration.models, "errors": []},
     )
+
+
+@app.post("/upload-and-classify")
+async def request_classification_upload(request: Request):
+
+    # Load the form data from the post request
+    form = ClassificationUploadForm(request)
+    await form.load_data()
+
+    if form.is_valid():
+        # Retrive image_bytes loaded and model id from the form
+        bytes_img = form.image_bytes
+        model_id = form.model_id
+
+        # Classify the image using raw bytes instead of a file, utilizing fetch_image_bytes to process the input
+        classification_scores = classify_image(model_id=model_id, img_id=bytes_img, fetch_image=fetch_image_bytes)
+
+        # Render the classification results template
+        return templates.TemplateResponse(
+            "classification_output.html",
+            {
+                "request": request,
+                "classification_scores": classification_scores,
+            },
+        )
+    else:
+        # if the form is not valid, then return the home page template
+        return templates.TemplateResponse(
+            "classification_upload_image.html",
+            {
+                "request": request,
+                "models": Configuration.models,
+                "errors": form.errors,
+            }
+        )
