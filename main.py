@@ -9,7 +9,7 @@ from app.forms.classification_upload_form import ClassificationUploadForm
 from app.ml.classification_utils import classify_image
 from app.ml.classification_utils import fetch_image_bytes
 from app.utils import list_images
-
+import base64
 
 app = FastAPI()
 config = Configuration()
@@ -82,11 +82,16 @@ async def request_classification_upload(request: Request):
         # Classify the image using raw bytes instead of a file, utilizing fetch_image_bytes to process the input
         classification_scores = classify_image(model_id=model_id, img_id=bytes_img, fetch_image=fetch_image_bytes)
 
+        # Encode the image in Base64 to embed it directly in the HTML template
+        b64_img = base64.b64encode(bytes_img).decode('utf-8')
+
+
         # Render the classification results template
         return templates.TemplateResponse(
-            "classification_output.html",
+            "classification_upload_output.html",
             {
                 "request": request,
+                "image_base64": b64_img,
                 "classification_scores": classification_scores,
             },
         )
