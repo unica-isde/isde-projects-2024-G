@@ -1,10 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Classification Results</h4>
+        </div>
+
+        <div class="card-body">
+            <!-- Image Display -->
+            <div class="text-center mb-4">
+                <img src="data:image/jpeg;base64,{{ image_base64 }}"
+                     class="img-fluid rounded"
+                     style="max-height: 400px;">
+            </div>
+
+            <!-- Classification Results -->
+            <div class="mb-4">
+                <h5 class="border-bottom pb-2">Top Predictions</h5>
+
+                <table class="table table-hover">
+                    <tbody>
+                        {% for item in classification_scores|sort(attribute=1, reverse=True) %}
+                        <tr>
+                            <td class="align-middle" style="width: 60%">{{ item[0] }}</td>
+                            <td style="width: 40%">
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 mr-2" style="height: 6px">
+                                        <!-- The width of the progress bar is calculated based on the classifier's score (in percentage) -->
+                                        <div class="progress-bar bg-success"
+                                             style="width: {{ (item[1]) | round(2) }}%">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center mt-4">
+                <a href="/upload-image" class="btn btn-dark">
+                    <i class="fas fa-arrow-left mr-1"></i> New Classification
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

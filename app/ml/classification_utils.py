@@ -53,7 +53,7 @@ def get_model(model_id):
         raise ImportError
 
 
-def classify_image(model_id, img_id):
+def classify_image(model_id, img_id, fetch_image=fetch_image):
     """Returns the top-5 classification score output from the
     model specified in model_id when it is fed with the
     image corresponding to img_id."""
