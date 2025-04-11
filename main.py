@@ -13,6 +13,7 @@ from app.forms.transformation_form import TransformForm
 from app.ml.transformation_utils import transform_image, cleanup_transforms
 
 import base64
+import matplotlib
 
 app = FastAPI()
 config = Configuration()
