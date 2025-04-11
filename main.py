@@ -10,6 +10,7 @@ from app.ml.classification_utils import classify_image
 from app.ml.classification_utils import fetch_image_bytes
 from app.utils import list_images
 import base64
+import matplotlib
 
 app = FastAPI()
 config = Configuration()
