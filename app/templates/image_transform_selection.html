@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .param-control {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .param-slider {
+        flex-grow: 1;
+        margin-right: 15px;
+    }
+    .param-value {
+        width: 80px;
+    }
+    .param-label {
+        min-width: 100px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h3 class="card-header text-center">Transform Image</h3>
+            <div class="card-body">
+                <form action="/transform" method="post" id="transformForm">
+                    <!-- image selection -->
+                    <div class="form-group mb-4">
+                        <label for="image_id">Select Image</label>
+                        <select name="image_id" class="form-control" required>
+                            {% for image in images %}
+                            <option value="{{ image }}">{{ image }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- transformation controls -->
+                    {% for param in ['color', 'brightness', 'contrast', 'sharpness'] %}
+                    <div class="param-control">
+                        <span class="param-label">{{ param|title }}</span>
+                        <input type="range" id="{{ param }}_slider"
+                               class="form-control-range param-slider"
+                               min="0" max="100" step="1" value="50"
+                               oninput="updateSliderValue('{{ param }}')">
+                        <input type="number" id="{{ param }}_number"
+                               class="form-control param-value"
+                               min="0" max="100" step="1" value="50"
+                               oninput="updateSliderValue('{{ param }}')">
+                        <input type="hidden" name="{{ param }}" id="{{ param }}_actual" value="1.0">
+                    </div>
+                    {% endfor %}
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Apply Transformations</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize sliders
+document.addEventListener('DOMContentLoaded', function() {
+    ['color', 'brightness', 'contrast', 'sharpness'].forEach(param => {
+        // Set initial value to exactly 1.0
+        document.getElementById(`${param}_actual`).value = "1.0";
+    });
+});
+
+function updateActualValue(param, displayValue) {
+    const actual = document.getElementById(`${param}_actual`);
+    const value = parseFloat(displayValue);
+
+    // Fix for default values
+    if (value === 50) {
+        actual.value = "1.0";
+    } else {
+        // For other values: 0 → 0.1, 100 → 2.0
+        actual.value = (0.1 + (value * 1.9 / 100)).toFixed(2);
+    }
+}
+
+function updateSliderValue(param) {
+    const slider = document.getElementById(`${param}_slider`);
+    const number = document.getElementById(`${param}_number`);
+
+    // Sync values
+    if (event.target.id === `${param}_slider`) {
+        number.value = slider.value;
+    } else {
+        slider.value = number.value;
+    }
+    updateActualValue(param, slider.value);
+}
+</script>
+{% endblock %}
