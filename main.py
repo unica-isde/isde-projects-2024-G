@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -9,6 +9,9 @@ from app.forms.classification_upload_form import ClassificationUploadForm
 from app.ml.classification_utils import classify_image
 from app.ml.classification_utils import fetch_image_bytes
 from app.utils import list_images
+from app.forms.transformation_form import TransformForm
+from app.ml.transformation_utils import transform_image, cleanup_transforms
+
 import base64
 
 app = FastAPI()
@@ -104,4 +107,68 @@ async def request_classification_upload(request: Request):
                 "models": Configuration.models,
                 "errors": form.errors,
             }
+        )
+
+
+
+@app.get("/transform", response_class=HTMLResponse)
+def transform_form(request: Request):
+    """Renders a form to select an image and specify transformation parameters."""
+    return templates.TemplateResponse(
+        "image_transform_selection.html", {"request": request, "images": list_images()}
+    )
+
+
+@app.post("/transform")
+async def transform_post(
+        request: Request,
+        background_tasks: BackgroundTasks,
+):
+    form = TransformForm(request)
+    await form.load_data()
+
+    if not form.is_valid():
+        return templates.TemplateResponse(
+            "image_transform_selection.html",
+            {
+                "request": request,
+                "images": list_images(),
+                "errors": form.errors
+            },
+            status_code=400
+        )
+
+    try:
+        transformed_name = transform_image(
+            image_id=form.image_id,
+            brightness=form.brightness,
+            contrast=form.contrast,
+            color=form.color,
+            sharpness=form.sharpness,
+        )
+
+        # Clean up old files first
+        background_tasks.add_task(cleanup_transforms)
+
+        return templates.TemplateResponse(
+            "image_transform_output.html",
+            {
+                "request": request,
+                "image_id": form.image_id,
+                "transformed_name": transformed_name,
+                "color": form.color,
+                "brightness": form.brightness,
+                "contrast": form.contrast,
+                "sharpness": form.sharpness
+            },
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "image_transform_selection.html",
+            {
+                "request": request,
+                "images": list_images(),
+                "errors": [str(e)]
+            },
+            status_code=400
         )
