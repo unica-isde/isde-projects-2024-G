@@ -176,8 +176,14 @@ async def transform_post(
 
 
 @app.get("/image_histogram")
+@app.get("/histogram")
 def create_histogram(request: Request):
     return templates.TemplateResponse(
         "histogram_select.html",
         {"request": request, "images": list_images()},
     )
+
+
+# @app.post("/histogram")
+# async def request_image_histogram(request: Request):
+
