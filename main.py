@@ -6,11 +6,14 @@ from fastapi.templating import Jinja2Templates
 from app.config import Configuration
 from app.forms.classification_form import ClassificationForm
 from app.forms.classification_upload_form import ClassificationUploadForm
+from app.forms.histogram_form import HistogramForm
+from app.histogram.histogram_utils import mean_histogram
 from app.ml.classification_utils import classify_image
 from app.ml.classification_utils import fetch_image_bytes
 from app.utils import list_images
+from app.histogram import histogram_utils
 import base64
-import matplotlib
+# import matplotlib may not be needed here if I create histogram_utils
 
 app = FastAPI()
 config = Configuration()
@@ -116,6 +119,21 @@ def create_histogram(request: Request):
     )
 
 
-# @app.post("/histogram")
-# async def request_image_histogram(request: Request):
+@app.post("/histogram")
+async def request_histogram(request: Request):
+    form = HistogramForm(request)
+    await form.load_data()
 
+    image_id = form.image_id
+    histogram_base64 = mean_histogram(image_id)
+    # print(f'Histogram = {histogram_base64}')
+    # plot is correctly computed; the problem is between main and histogram_output
+    # histogram_base64 is the python obj; in the html file refer to histogram
+    return templates.TemplateResponse(
+        "histogram_output.html",
+        {
+            "request": request,
+            "image_id": image_id,
+            "histogram": histogram_base64,
+        }
+    )
