@@ -188,7 +188,7 @@ def create_histogram(request: Request):
 async def request_histogram(request: Request):
     form = HistogramForm(request)
     await form.load_data()
-    # commenting to push the rebasing
+
     image_id = form.image_id
     histogram_type = form.type
     print(histogram_type)
