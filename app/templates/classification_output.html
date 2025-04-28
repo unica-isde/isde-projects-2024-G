@@ -30,15 +30,11 @@
                     </div>
                 </div>
             </div>
-
             <br>
-
             <a class="btn btn-primary" href="/classifications" role="button">Back</a>
-
-            <a class="btn btn-secondary" href="#" role="button"> Download </a>
+            <a class="btn btn-secondary" href="/download/?scores={{ classification_scores }}" role="button"> Download </a>
         </div>
 
     </div>
-    <script src="{{ "static/graph.js" }}" id="makeGraph" classification_scores="{{classification_scores}}"></script>
+    <script src="{{ "static/graph.js" }}" id="makeGraph" classification_scores="{{ classification_scores }}"></script>
 {% endblock %}
-
