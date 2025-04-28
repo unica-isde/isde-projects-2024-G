@@ -1,6 +1,8 @@
+import io
 import json
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+import zipfile
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.config import Configuration
@@ -54,4 +56,28 @@ async def request_classification(request: Request):
             "image_id": image_id,
             "classification_scores": json.dumps(classification_scores),
         },
+    )
+
+@app.get("/download")
+async def download(scores: str):
+    try:
+        classification_scores = json.loads(scores)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON data.")
+
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        scores_data = json.dumps(classification_scores, indent=2).encode("utf-8")
+        zip_file.writestr("classification_scores.json", scores_data)
+
+    zip_buffer.seek(0)
+
+    return StreamingResponse(
+        zip_buffer,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": "attachment; filename=results.zip",
+            "Content-Type": "application/zip",
+        }
     )
