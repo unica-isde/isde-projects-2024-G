@@ -1,6 +1,7 @@
 import io
 import json
 import zipfile
+import matplotlib.pyplot as plt
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -65,11 +66,28 @@ async def download(scores: str):
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON data.")
 
+    labels = [item[0] for item in classification_scores]
+    data = [item[1] for item in classification_scores]
+
+    plt.barh(
+        labels, data,
+        color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"]
+    )
+    plt.grid()
+    plt.title("Classification Scores")
+    plt.gca().invert_yaxis()
+    img_buffer = io.BytesIO()
+    plt.tight_layout()
+    plt.savefig(img_buffer, format="png")
+    img_buffer.seek(0)
+    plt.close()
+
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
         scores_data = json.dumps(classification_scores, indent=2).encode("utf-8")
         zip_file.writestr("classification_scores.json", scores_data)
+        zip_file.writestr("top5_scores.png", img_buffer.getvalue())
 
     zip_buffer.seek(0)
 
