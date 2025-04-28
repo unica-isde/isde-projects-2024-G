@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <style>
+        .large-front-thumbnail {
+            position: relative;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+    </style>
+    <div class="row">
+        <!-- show image -->
+        <div class="col">
+            <div class="card">
+                <img class="large-front-thumbnail"
+                     src="{{ 'static/imagenet_subset/'+image_id }} "
+                     alt={{ image_id }}/>
+            </div>
+        </div>
+        <!-- show histogram -->
+        <div class="col">
+            <div class="card">
+                <div class="row">
+                <img class="large-front-thumbnail"
+                     src="data:image/png;base64,{{ histogram }}"
+                     alt="error"/>
+                </div>
+            </div>
+            <a class="btn btn-primary" href="/histogram" role="button">Back</a>
+        </div>
+    </div>
+{%  endblock %}
