@@ -6,3 +6,4 @@ Pillow
 python-multipart
 matplotlib
 numpy
+opencv-python
