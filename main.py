@@ -11,7 +11,6 @@ from app.histogram.histogram_utils import histogram_hub
 from app.ml.classification_utils import classify_image
 from app.ml.classification_utils import fetch_image_bytes
 from app.utils import list_images
-from app.histogram import histogram_utils
 from app.forms.transformation_form import TransformForm
 from app.ml.transformation_utils import transform_image, cleanup_transforms
 
@@ -194,7 +193,6 @@ async def request_histogram(request: Request):
     histogram_type = form.type
     print(histogram_type)
     histogram_base64 = histogram_hub(image_id, histogram_type)
-    # histogram_base64 is the python obj; in the html file refer to histogram
     return templates.TemplateResponse(
         "histogram_output.html",
         {
