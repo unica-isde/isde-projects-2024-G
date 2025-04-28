@@ -16,6 +16,15 @@
                 {% endfor %}
             </select>
         </p>
+        <h3>
+            Histogram Type:
+        </h3>
+        <p>
+            <select name="type">
+                <option value="Mean" SELECTED>Mean Histogram</option>
+                <option value="RGB" SELECTED>RGB Histograms</option>
+            </select>
+        </p>
         <button type="submit" class="btn btn-dark mb-2">Submit</button>
     </form>
 {% endblock %}
