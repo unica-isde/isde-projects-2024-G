@@ -4,3 +4,6 @@ torchvision
 requests
 Pillow
 python-multipart
+matplotlib
+numpy
+opencv-python
