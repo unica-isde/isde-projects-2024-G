@@ -1,4 +1,6 @@
-"""This function generates the mean histogram of the selected image."""
+"""
+This file contains the functions to generate the histogram of the selected image.
+"""
 import base64
 import io
 import os
@@ -14,6 +16,10 @@ conf = Configuration()
 
 
 def histogram_hub(image_id, histogram_type):
+    """
+    Receives from the HTML form the selected image, in the form of the ID, and the histogram type chosen by the user.
+    The function calls the correct function to generate the desired histogram by passing the image_id.
+    """
     match histogram_type:
         case "Mean":
             return mean_histogram(image_id)
@@ -22,6 +28,9 @@ def histogram_hub(image_id, histogram_type):
 
 
 def mean_histogram(image_id):
+    """
+    Generates the mean histogram of the image.
+    """
     image_path = os.path.join(conf.image_folder_path, image_id)
     # Open the image
     im = Image.open(image_path)
@@ -47,12 +56,19 @@ def mean_histogram(image_id):
 
 
 def RGB_histogram(image_id):
+    """
+    Generates a histogram which plots the pixel intensities of the RGB channels separated.
+    Plots in red the intensity of the red channel, same goes for green and blue.
+    """
     image_path = os.path.join(conf.image_folder_path, image_id)
     im = cv2.imread(image_path)
     histSize = 256
     histRange = (0, histSize)
+
+    # Converts the image from BGR color space to RGB color space
     rgb = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-    # calcHist
+
+    # Plotting the histogram
     color = ('b', 'g', 'r')
     plt.figure()
     for i, col in enumerate(color):

@@ -189,6 +189,9 @@ def create_histogram(request: Request):
 
 @app.post("/histogram")
 async def request_histogram(request: Request):
+    """
+    Shows both the selected image and the histogram of said image.
+    """
     form = HistogramForm(request)
     await form.load_data()
 
