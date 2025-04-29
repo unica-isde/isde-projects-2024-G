@@ -69,6 +69,20 @@ async def request_classification(request: Request):
 
 @app.get("/upload-image", response_class=HTMLResponse)
 def upload_image(request: Request):
+    """
+       Returns the image upload page along with the upload form.
+
+       Parameters
+       ----------
+       request : Request
+           The request sent by the user.
+
+       Returns
+       -------
+       templates.TemplateResponse
+           An HTML page containing the image upload form,
+           the list of available models, and an empty error list.
+       """
     return templates.TemplateResponse(
         "classification_upload_image.html",
         {"request": request, "models": Configuration.models, "errors": []},
@@ -77,6 +91,20 @@ def upload_image(request: Request):
 
 @app.post("/upload-and-classify")
 async def request_classification_upload(request: Request):
+    """
+    This function processes the image classification request submitted via the upload form.
+
+    Parameters
+    ----------
+    request : Request
+        The request that the user sends to the server containing the image and selected model.
+
+    Returns
+    -------
+    templates.TemplateResponse
+        The page with the uploaded image and its classification scores,
+        or the upload form page with error messages if the submitted data is invalid.
+    """
 
     # Load the form data from the post request
     form = ClassificationUploadForm(request)
