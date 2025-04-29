@@ -208,19 +208,19 @@ async def request_histogram(request: Request):
 @app.get("/download")
 async def download(scores: str):
     """
-        Processes classification scores, generates a bar chart,
-        and packages the chart and scores into a downloadable ZIP file.
-        Args:
-            scores (str): A JSON-formatted string containing classification scores.
-                          Each item in the JSON should be a list where the first
-                          element is the label (str) and the second element is the
-                          score (float).
-        Returns:
-            StreamingResponse: A response containing a ZIP file with:
-                - "classification_scores.json": The original classification scores in JSON format.
-                - "top5_scores.png": A horizontal bar chart visualizing the scores.
-        Raises:
-            HTTPException: If the input `scores` is not valid JSON data.
+    Processes classification scores, generates a bar chart,
+    and packages the chart and scores into a downloadable ZIP file.
+    Args:
+        scores (str): A JSON-formatted string containing classification scores.
+                      Each item in the JSON should be a list where the first
+                      element is the label (str) and the second element is the
+                      score (float).
+    Returns:
+        StreamingResponse: A response containing a ZIP file with:
+            - "classification_scores.json": The original classification scores in JSON format.
+            - "top5_scores.png": A horizontal bar chart visualizing the scores.
+    Raises:
+        HTTPException: If the input `scores` is not valid JSON data.
     """
     try:
         classification_scores = json.loads(scores)
@@ -231,8 +231,7 @@ async def download(scores: str):
     data = [item[1] for item in classification_scores]
 
     plt.barh(
-        labels, data,
-        color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"]
+        labels, data, color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"]
     )
     plt.grid()
     plt.title("Classification Scores")
