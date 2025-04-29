@@ -63,12 +63,12 @@ async def request_classification(request: Request):
 @app.get("/download")
 async def download(scores: str):
     """
-    Processes classification scores, generates a bar chart, 
+    Processes classification scores, generates a bar chart,
     and packages the chart and scores into a downloadable ZIP file.
     Args:
-        scores (str): A JSON-formatted string containing classification scores. 
-                      Each item in the JSON should be a list where the first 
-                      element is the label (str) and the second element is the 
+        scores (str): A JSON-formatted string containing classification scores.
+                      Each item in the JSON should be a list where the first
+                      element is the label (str) and the second element is the
                       score (float).
     Returns:
         StreamingResponse: A response containing a ZIP file with:
@@ -77,7 +77,7 @@ async def download(scores: str):
     Raises:
         HTTPException: If the input `scores` is not valid JSON data.
     """
-    
+
     try:
         classification_scores = json.loads(scores)
     except json.JSONDecodeError:
@@ -87,8 +87,7 @@ async def download(scores: str):
     data = [item[1] for item in classification_scores]
 
     plt.barh(
-        labels, data,
-        color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"]
+        labels, data, color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"]
     )
     plt.grid()
     plt.title("Classification Scores")
@@ -114,5 +113,5 @@ async def download(scores: str):
         headers={
             "Content-Disposition": "attachment; filename=results.zip",
             "Content-Type": "application/zip",
-        }
+        },
     )
