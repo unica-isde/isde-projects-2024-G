@@ -12,6 +12,7 @@
         }
 
     </style>
+    <br>
     <div class="row">
         <div class="col">
             <div class="card">
@@ -26,10 +27,13 @@
                     <canvas id="classificationOutput" style="width: 50%; margin: auto; padding: 20px;"></canvas>
                     <div class="align-items-center">
                         <h2 id="waitText"></h2>
-                        </div>
                     </div>
                 </div>
-                <a class="btn btn-primary" href="/classifications" role="button">Back</a>
+            </div>
+            <br>
+            <a class="btn btn-primary" href="/classifications" role="button">Back</a>
+            <a class="btn btn-secondary" href="/download/json?scores={{ classification_scores }}" role="button">Download scores (.json)</a>
+            <a class="btn btn-secondary" href="/download/png?scores={{ classification_scores }}" role="button">Download chart (.png)</a>
         </div>
     </div>
     <script src="{{ "static/graph.js" }}" id="makeGraph" classification_scores="{{classification_scores}}"></script>

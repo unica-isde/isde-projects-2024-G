@@ -6,6 +6,7 @@ import importlib
 import json
 import logging
 import os
+import io
 import torch
 from PIL import Image
 from torchvision import transforms
@@ -21,6 +22,11 @@ def fetch_image(image_id):
     downloaded in the folder specified in the configuration object."""
     image_path = os.path.join(conf.image_folder_path, image_id)
     img = Image.open(image_path)
+    return img
+
+def fetch_image_bytes(bytes_img):
+    """Returns the Pillow image from bytes received in the post request"""
+    img = Image.open(io.BytesIO(bytes_img))
     return img
 
 
@@ -47,7 +53,7 @@ def get_model(model_id):
         raise ImportError
 
 
-def classify_image(model_id, img_id):
+def classify_image(model_id, img_id, fetch_image=fetch_image):
     """Returns the top-5 classification score output from the
     model specified in model_id when it is fed with the
     image corresponding to img_id."""
