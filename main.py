@@ -236,23 +236,35 @@ async def request_histogram(request: Request):
         }
     )
 
-@app.get("/download")
-async def download(scores: str):
+@app.get("/download/json")
+async def download_json(scores: str):
     """
-    Processes classification scores, generates a bar chart,
-    and packages the chart and scores into a downloadable ZIP file.
-    Args:
-        scores (str): A JSON-formatted string containing classification scores.
-                      Each item in the JSON should be a list where the first
-                      element is the label (str) and the second element is the
-                      score (float).
-    Returns:
-        StreamingResponse: A response containing a ZIP file with:
-            - "classification_scores.json": The original classification scores in JSON format.
-            - "top5_scores.png": A horizontal bar chart visualizing the scores.
-    Raises:
-        HTTPException: If the input `scores` is not valid JSON data.
+    Returns classification scores as a downloadable JSON file.
     """
+
+    try:
+        classification_scores = json.loads(scores)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON data.")
+
+    scores_data = json.dumps(classification_scores, indent=2).encode("utf-8")
+    file_buffer = io.BytesIO(scores_data)
+
+    return StreamingResponse(
+        file_buffer,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": "attachment; filename=classification_scores.json"
+        },
+    )
+
+
+@app.get("/download/png")
+async def download_png(scores: str):
+    """
+    Returns classification scores as a downloadable bar chart (PNG).
+    """
+
     try:
         classification_scores = json.loads(scores)
     except json.JSONDecodeError:
@@ -262,31 +274,24 @@ async def download(scores: str):
     data = [item[1] for item in classification_scores]
 
     plt.barh(
-        labels, data, color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"]
+        labels,
+        data,
+        color=["#1a4a04", "#750014", "#795703", "#06216c", "#3f0355"],
     )
     plt.grid()
     plt.title("Classification Scores")
     plt.gca().invert_yaxis()
+
     img_buffer = io.BytesIO()
     plt.tight_layout()
     plt.savefig(img_buffer, format="png")
     img_buffer.seek(0)
     plt.close()
 
-    zip_buffer = io.BytesIO()
-
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        scores_data = json.dumps(classification_scores, indent=2).encode("utf-8")
-        zip_file.writestr("classification_scores.json", scores_data)
-        zip_file.writestr("top5_scores.png", img_buffer.getvalue())
-
-    zip_buffer.seek(0)
-
     return StreamingResponse(
-        zip_buffer,
-        media_type="application/zip",
+        img_buffer,
+        media_type="image/png",
         headers={
-            "Content-Disposition": "attachment; filename=results.zip",
-            "Content-Type": "application/zip",
+            "Content-Disposition": "attachment; filename=top5_scores.png"
         },
     )
