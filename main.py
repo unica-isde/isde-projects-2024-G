@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, Request, Form, BackgroundTasks, HTTPException
+from fastapi import FastAPI, Request, BackgroundTasks, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -16,7 +16,6 @@ from app.ml.transformation_utils import transform_image, cleanup_transforms
 
 import io
 import base64
-import zipfile
 import matplotlib.pyplot as plt
 
 app = FastAPI()
